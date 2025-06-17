@@ -1,25 +1,20 @@
 const DELAY = 2000;
+const DOMAIN = 'prepmyfuture.com';
+const STORAGE_KEY = 'autoClickEnabled';
 
-const targets = [
-    'Accéder',
-    'valider',
-    'question suivante',
-];
+const targets = ['Accéder', 'valider', 'question suivante'];
 
-const domaine = () => {
-    return window.location.hostname;
-}
+const domaine = () => window.location.hostname;
 
-const urlHasParams = (param) => {
+const urlHasParams = (payload) => {
     const params = new URLSearchParams(window.location.search);
-    return params.has(param) || params.get(param) !== null;
-}
+    if (typeof payload === 'string') return params.has(payload);
+    if (Array.isArray(payload)) return payload.some(p => params.has(p));
+};
 
-const reduce = (txt) => {
-    return txt.trim().toLowerCase();
-}
+const reduce = (txt) => txt.trim().toLowerCase();
 
-if (domaine() === 'prepmyfuture.com' && urlHasParams('user_exercise_id')) {
+const runInterval = () => {
     setInterval(() => {
         const buttons = [
             ...document.querySelectorAll('.btn.btn-primary'),
@@ -36,8 +31,18 @@ if (domaine() === 'prepmyfuture.com' && urlHasParams('user_exercise_id')) {
                 button.click();
                 console.log(`Button clicked: ${text}`);
             } else {
-                console.log(`Button not clicked: ${text} (does not match targets)`);
+                console.log(`Button not clicked: ${text}`);
             }
         });
     }, DELAY);
+};
+
+if (domaine() === DOMAIN && urlHasParams(['user_exercise_id', 'study_plan_activity_id', 'id'])) {
+    chrome.storage.local.get([STORAGE_KEY], (result) => {
+        if (result[STORAGE_KEY]) {
+            runInterval();
+        } else {
+            console.log('Auto click is disabled in storage.');
+        }
+    });
 }
