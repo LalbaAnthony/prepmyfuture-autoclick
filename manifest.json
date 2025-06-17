@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "PrepMyFuture Autoclick",
+    "version": "1.0",
+    "description": "A simple extension to auto click on all buttons on PrepMyFuture website.",
+    "action": {
+        "default_popup": "src/popup.html",
+        "default_icon": "assets/icon.png"
+    },
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "src/main.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ]
+}
